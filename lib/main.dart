@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:instaclone/blocs/auth/auth_bloc.dart';
 import 'package:instaclone/config/custom_router.dart';
+import 'package:instaclone/cubits/cubits.dart';
 import 'package:instaclone/screens/screens.dart';
 
 import 'blocs/simple_bloc_observer.dart';
@@ -39,6 +40,9 @@ class MyApp extends StatelessWidget {
         ),
         RepositoryProvider<PostRepository>(
           create: (_) => PostRepository(),
+        ),
+        RepositoryProvider<NotificationRepository>(
+          create: (_) => NotificationRepository(),
         )
       ],
       child: MultiBlocProvider(
@@ -46,6 +50,12 @@ class MyApp extends StatelessWidget {
           BlocProvider<AuthBloc>(
             create: (context) => AuthBloc(
               authRepository: context.read<AuthRepository>(),
+            ),
+          ),
+          BlocProvider<LikedPostsCubit>(
+            create: (context) => LikedPostsCubit(
+              postRepository: context.read<PostRepository>(),
+              authBloc: context.read<AuthBloc>(),
             ),
           )
         ],

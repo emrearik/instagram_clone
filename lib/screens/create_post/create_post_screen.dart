@@ -108,7 +108,7 @@ class CreatePostScreen extends StatelessWidget {
 
   void _selectPostImage(BuildContext context) async {
     final pickedFile = await ImageHelper.pickImageFormGallery(
-        context: context, cropstyle: CropStyle.circle, title: 'Create Post');
+        context: context, cropstyle: CropStyle.rectangle, title: 'Create Post');
     if (pickedFile != null) {
       context.read<CreatePostCubit>().postImageChanged(
             pickedFile,

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:instaclone/blocs/blocs.dart';
+import 'package:instaclone/cubits/cubits.dart';
 import 'package:instaclone/models/models.dart';
 import 'package:instaclone/repositories/repositories.dart';
 
@@ -13,6 +14,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final UserRepository _userRepository;
   final PostRepository _postRepository;
   final AuthBloc _authBloc;
+  final LikedPostsCubit _likedPostsCubit;
 
   StreamSubscription<List<Future<Post?>>>? _postsSubscription;
 
@@ -20,9 +22,11 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     required UserRepository userRepository,
     required PostRepository postRepository,
     required AuthBloc authBloc,
+    required LikedPostsCubit likedPostsCubit,
   })  : _userRepository = userRepository,
         _postRepository = postRepository,
         _authBloc = authBloc,
+        _likedPostsCubit = likedPostsCubit,
         super(ProfileState.initial());
 
   @override
@@ -95,6 +99,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     ProfileUpdatePosts event,
   ) async* {
     yield state.copyWith(posts: event.posts);
+    final likedPostIDs = await _postRepository.getLikedPostIDs(
+        userID: _authBloc.state.user!.uid, posts: event.posts);
+
+    _likedPostsCubit.updateLikedPosts(postIDs: likedPostIDs);
   }
 
   Stream<ProfileState> _mapProfileFollowUserToState() async* {

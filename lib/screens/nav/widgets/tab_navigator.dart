@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:instaclone/blocs/blocs.dart';
 import 'package:instaclone/config/custom_router.dart';
+import 'package:instaclone/cubits/cubits.dart';
 import 'package:instaclone/enums/enums.dart';
 import 'package:instaclone/repositories/repositories.dart';
 import 'package:instaclone/screens/create_post/cubit/create_post_cubit.dart';
+import 'package:instaclone/screens/feed/bloc/feed_bloc.dart';
+import 'package:instaclone/screens/notifications/bloc/notifications_bloc.dart';
 import 'package:instaclone/screens/profile/bloc/profile_bloc.dart';
 import 'package:instaclone/screens/screens.dart';
 import 'package:instaclone/screens/search/cubit/search_cubit.dart';
@@ -42,7 +45,14 @@ class TabNavigator extends StatelessWidget {
   Widget _getScreen(BuildContext context, BottomNavItem item) {
     switch (item) {
       case BottomNavItem.feed:
-        return FeedScreen();
+        return BlocProvider<FeedBloc>(
+          create: (context) => FeedBloc(
+            postRepository: context.read<PostRepository>(),
+            authBloc: context.read<AuthBloc>(),
+            likedPostsCubit: context.read<LikedPostsCubit>(),
+          )..add(FeedFetchPosts()),
+          child: FeedScreen(),
+        );
       case BottomNavItem.search:
         return BlocProvider<SearchCubit>(
           create: (context) => SearchCubit(
@@ -60,13 +70,17 @@ class TabNavigator extends StatelessWidget {
           child: CreatePostScreen(),
         );
       case BottomNavItem.notifications:
-        return NotificationsScreen();
+        return BlocProvider(
+          create: (context) => NotificationsBloc(notificationRepository: context.read<NotificationRepository>(),authBloc: context.read<AuthBloc>(),),
+          child: NotificationsScreen(),
+        );
       case BottomNavItem.profile:
         return BlocProvider<ProfileBloc>(
           create: (context) => ProfileBloc(
             userRepository: context.read<UserRepository>(),
             postRepository: context.read<PostRepository>(),
             authBloc: context.read<AuthBloc>(),
+            likedPostsCubit: context.read<LikedPostsCubit>(),
           )..add(ProfileLoadUser(
               userID: context.read<AuthBloc>().state.user!.uid)),
           child: ProfileScreen(),

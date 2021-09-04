@@ -6,7 +6,7 @@ import 'package:instaclone/models/models.dart';
 
 class Comment extends Equatable {
   final String? id;
-  final String postID;
+  final String? postID;
   final User? author;
   final String content;
   final DateTime date;
